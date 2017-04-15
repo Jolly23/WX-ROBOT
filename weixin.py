@@ -362,26 +362,31 @@ class WebWeixin(object):
         return dic['ContactList']
 
     def testsynccheck(self):
-        SyncHost = ['wx2.qq.com',
-                    'webpush.wx2.qq.com',
-                    'wx8.qq.com',
-                    'webpush.wx8.qq.com',
-                    'qq.com',
-                    'webpush.wx.qq.com',
-                    'web2.wechat.com',
-                    'webpush.web2.wechat.com',
-                    'wechat.com',
-                    'webpush.web.wechat.com',
-                    'webpush.weixin.qq.com',
-                    'webpush.wechat.com',
-                    'webpush1.wechat.com',
-                    'webpush2.wechat.com',
-                    'webpush.wx.qq.com',
-                    'webpush2.wx.qq.com']
+        SyncHost = [
+            'wx2.qq.com',
+            'webpush.wx2.qq.com',
+            'wx8.qq.com',
+            'webpush.wx8.qq.com',
+            'qq.com',
+            'webpush.wx.qq.com',
+            'web2.wechat.com',
+            'webpush.web2.wechat.com',
+            'wechat.com',
+            'webpush.web.wechat.com',
+            'webpush.weixin.qq.com',
+            'webpush.wechat.com',
+            'webpush1.wechat.com',
+            'webpush2.wechat.com',
+            'webpush.wx.qq.com',
+            'webpush2.wx.qq.com'
+        ]
+        temp_int = 0
         for host in SyncHost:
+            temp_int += 1
+            print('线路测试 {} ／ {}'.format(temp_int, len(SyncHost)))
             self.syncHost = host
-            [retcode, selector] = self.synccheck()
-            if retcode == '0':
+            [errcode, selector] = self.synccheck()
+            if errcode == '0':
                 return True
         return False
 
@@ -400,8 +405,7 @@ class WebWeixin(object):
         if data == '':
             return [-1, -1]
 
-        pm = re.search(
-            r'window.synccheck={retcode:"(\d+)",selector:"(\d+)"}', data)
+        pm = re.search(r'window.synccheck={retcode:"(\d+)",selector:"(\d+)"}', data)
         retcode = pm.group(1)
         selector = pm.group(2)
         return [retcode, selector]

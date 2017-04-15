@@ -5,10 +5,7 @@ from hashlib import md5
 
 
 def chat_api(text, user_id=None):
-    payload = {
-        'key': 'http://www.tuling123.com/openapi/api',
-        'info': text,
-    }
+    payload = {'key': 'a90fdac0979a333ec36ebc25f11ee1c9', 'info': text}
     if user_id:
         payload['userid'] = md5(str(user_id)).hexdigest()
     try:
