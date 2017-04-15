@@ -32,6 +32,15 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from chat_robot import chat_api
 
+try:
+    b = u'\u2588'
+    sys.stdout.write(b + '\r')
+    sys.stdout.flush()
+except UnicodeEncodeError:
+    BLOCK = 'MM'
+else:
+    BLOCK = b
+
 
 def catchKeyboardInterrupt(fn):
     def wrapper(*args):
@@ -134,7 +143,7 @@ class WebWeixin(object):
         opener.addheaders = [('User-agent', self.user_agent)]
         urllib.request.install_opener(opener)
 
-    def print_cmd_qr(self, qrText, white='\u2588', black='  ', enableCmdQR=2):
+    def print_cmd_qr(self, qrText, white=BLOCK, black='  ', enableCmdQR=2):
         blockCount = int(enableCmdQR)
         if abs(blockCount) == 0:
             blockCount = 1
