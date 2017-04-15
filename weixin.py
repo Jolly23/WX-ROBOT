@@ -866,7 +866,7 @@ class WebWeixin(object):
     def listenMsgMode(self):
         print('[*] 进入消息监听模式 ... 成功')
         logging.debug('[*] 进入消息监听模式 ... 成功')
-        # self._run('[*] 进行同步线路测试 ... ', self.testsynccheck)
+        self._run('[*] 进行同步线路测试 ... ', self.testsynccheck)
         playWeChat = 0
         redEnvelope = 0
         while True:
