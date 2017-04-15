@@ -22,6 +22,7 @@ import urllib.request
 import urllib.request
 import xml.dom.minidom
 from collections import defaultdict
+from socket import timeout as timeout_err
 from urllib.parse import urlparse
 
 import qrcode
@@ -387,7 +388,9 @@ class WebWeixin(object):
             self.syncHost = host
             [errcode, selector] = self.synccheck()
             if errcode == '0':
+                print('线路 {} 连接成功'.format(temp_int))
                 return True
+            print('线路 {} 测试失败'.format(temp_int))
         return False
 
     def synccheck(self):
@@ -401,7 +404,7 @@ class WebWeixin(object):
             '_': int(time.time()),
         }
         url = 'https://' + self.syncHost + '/cgi-bin/mmwebwx-bin/synccheck?' + urllib.parse.urlencode(params)
-        data = self._get(url)
+        data = self._get(url, timeout=10)
         if data == '':
             return [-1, -1]
 
@@ -1092,7 +1095,7 @@ class WebWeixin(object):
             result = data.decode('utf-8')
         return result
 
-    def _get(self, url: object, api: object = None) -> object:
+    def _get(self, url: object, api: object = None, timeout: object = None) -> object:
         request = urllib.request.Request(url=url)
         request.add_header('Referer', 'https://wx.qq.com/')
         if api == 'webwxgetvoice':
@@ -1100,7 +1103,7 @@ class WebWeixin(object):
         if api == 'webwxgetvideo':
             request.add_header('Range', 'bytes=0-')
         try:
-            response = urllib.request.urlopen(request)
+            response = urllib.request.urlopen(request, timeout=timeout) if timeout else urllib.request.urlopen(request)
             try:
                 data = response.read().decode('utf-8')
             except UnicodeDecodeError:
@@ -1113,6 +1116,8 @@ class WebWeixin(object):
             logging.error('URLError = ' + str(e.reason))
         except http.client.HTTPException as e:
             logging.error('HTTPException')
+        except timeout_err:
+            logging.error('socket timed out - URL %s', url)
         except Exception:
             import traceback
             logging.error('generic exception: ' + traceback.format_exc())
