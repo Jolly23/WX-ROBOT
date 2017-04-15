@@ -1116,8 +1116,8 @@ class WebWeixin(object):
             logging.error('URLError = ' + str(e.reason))
         except http.client.HTTPException as e:
             logging.error('HTTPException')
-        except timeout_err:
-            logging.error('socket timed out - URL %s', url)
+        # except timeout_err:
+        #     logging.error('socket timed out - URL %s', url)
         except Exception:
             import traceback
             logging.error('generic exception: ' + traceback.format_exc())
