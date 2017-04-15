@@ -12,6 +12,7 @@ import os
 import platform
 import random
 import re
+import ssl
 import sys
 import time
 import urllib.error
@@ -1116,8 +1117,10 @@ class WebWeixin(object):
             logging.error('URLError = ' + str(e.reason))
         except http.client.HTTPException as e:
             logging.error('HTTPException')
-        # except timeout_err:
-        #     logging.error('socket timed out - URL %s', url)
+        except timeout_err as e:
+            logging.error('socket timed out')
+        except ssl.CertificateError as e:
+            logging.error('ssl.CertificateError')
         except Exception:
             import traceback
             logging.error('generic exception: ' + traceback.format_exc())
