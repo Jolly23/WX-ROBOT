@@ -268,10 +268,7 @@ class WebWeixin(object):
             return False
         self.SyncKey = dic['SyncKey']
         self.User = dic['User']
-        # synckey for synccheck
-        self.synckey = '|'.join(
-            [str(keyVal['Key']) + '_' + str(keyVal['Val']) for keyVal in self.SyncKey['List']])
-
+        self.synckey = '|'.join([str(keyVal['Key']) + '_' + str(keyVal['Val']) for keyVal in self.SyncKey['List']])
         return dic['BaseResponse']['Ret'] == 0
 
     def webwxstatusnotify(self):
@@ -415,9 +412,7 @@ class WebWeixin(object):
         return [retcode, selector]
 
     def webwxsync(self):
-        url = self.base_uri + \
-              '/webwxsync?sid=%s&skey=%s&pass_ticket=%s' % (
-                  self.sid, self.skey, self.pass_ticket)
+        url = self.base_uri + '/webwxsync?sid=%s&skey=%s&pass_ticket=%s' % (self.sid, self.skey, self.pass_ticket)
         params = {
             'BaseRequest': self.BaseRequest,
             'SyncKey': self.SyncKey,
@@ -429,7 +424,6 @@ class WebWeixin(object):
         if self.DEBUG:
             print(json.dumps(dic, indent=4))
             (json.dumps(dic, indent=4))
-
         if dic['BaseResponse']['Ret'] == 0:
             self.SyncKey = dic['SyncKey']
             self.synckey = '|'.join(
@@ -437,10 +431,8 @@ class WebWeixin(object):
         return dic
 
     def webwxsendmsg(self, word, to='filehelper'):
-        url = self.base_uri + \
-              '/webwxsendmsg?pass_ticket=%s' % (self.pass_ticket)
-        clientMsgId = str(int(time.time() * 1000)) + \
-                      str(random.random())[:5].replace('.', '')
+        url = self.base_uri + '/webwxsendmsg?pass_ticket=%s' % (self.pass_ticket)
+        clientMsgId = str(int(time.time() * 1000)) + str(random.random())[:5].replace('.', '')
         params = {
             'BaseRequest': self.BaseRequest,
             'Msg': {
@@ -477,15 +469,14 @@ class WebWeixin(object):
         # PassTicket
         pass_ticket = self.pass_ticket
         # clientMediaId
-        client_media_id = str(int(time.time() * 1000)) + \
-                          str(random.random())[:5].replace('.', '')
+        client_media_id = str(int(time.time() * 1000)) + str(random.random())[:5].replace('.', '')
         # webwx_data_ticket
         webwx_data_ticket = ''
         for item in self.cookie:
             if item.name == 'webwx_data_ticket':
                 webwx_data_ticket = item.value
                 break
-        if (webwx_data_ticket == ''):
+        if webwx_data_ticket == '':
             return "None Fuck Cookie"
 
         uploadmediarequest = json.dumps({
@@ -726,11 +717,9 @@ class WebWeixin(object):
                     return
                 tree = html.fromstring(temp)
                 url = tree.xpath('//html/body/div/img')[0].attrib['src']
-
                 for item in urlparse(url).query.split('&'):
                     if item.split('=')[0] == 'center':
                         loc = item.split('=')[-1:]
-
                 content = '%s 发送了一个 位置消息 - 我在 [%s](%s) @ %s]' % (
                     srcName, pos, url, loc)
 
@@ -791,28 +780,29 @@ class WebWeixin(object):
             if msgType == 1:
                 raw_msg = {'raw_msg': msg}
                 self._showMsg(raw_msg)
-                # 自己加的代码-------------------------------------------#
-                # if self.autoReplyRevokeMode:
-                #    store
-                # 自己加的代码-------------------------------------------#
                 if self.autoReplyMode:
                     ans = chat_api(content) + '\nJolly可能忙别的去啦～\n要是不介意不妨和小机器人聊聊'
-                    if self.webwxsendmsg(ans, msg['FromUserName']):
-                        print('自动回复: ' + ans)
-                        logging.info('自动回复: ' + ans)
-                    else:
-                        print('自动回复失败')
-                        logging.info('自动回复失败')
+                    if not msg['FromUserName'].startswith('@@'):
+                        if self.webwxsendmsg(ans, msg['FromUserName']):
+                            print('自动回复: ' + ans)
+                            logging.info('自动回复: ' + ans)
+                        else:
+                            print('自动回复失败')
+                            logging.info('自动回复失败')
             elif msgType == 3:
                 image = self.webwxgetmsgimg(msgid)
-                raw_msg = {'raw_msg': msg,
-                           'message': '%s 发送了一张图片: %s' % (name, image)}
+                raw_msg = {
+                    'raw_msg': msg,
+                    'message': '%s 发送了一张图片: %s' % (name, image)
+                }
                 self._showMsg(raw_msg)
                 self._safe_open(image)
             elif msgType == 34:
                 voice = self.webwxgetvoice(msgid)
-                raw_msg = {'raw_msg': msg,
-                           'message': '%s 发了一段语音: %s' % (name, voice)}
+                raw_msg = {
+                    'raw_msg': msg,
+                    'message': '%s 发了一段语音: %s' % (name, voice)
+                }
                 self._showMsg(raw_msg)
                 self._safe_open(voice)
             elif msgType == 42:
@@ -896,11 +886,11 @@ class WebWeixin(object):
                     r = self.webwxsync()
                     if r is not None:
                         self.handleMsg(r)
-                elif selector == '6':
-                    # TODO
-                    redEnvelope += 1
-                    print('[*] 收到疑似红包消息 %d 次' % redEnvelope)
-                    logging.debug('[*] 收到疑似红包消息 %d 次' % redEnvelope)
+                        # elif selector == '6':
+                        # TODO
+                        # redEnvelope += 1
+                        # print('[*] 收到疑似红包消息 %d 次' % redEnvelope)
+                        # logging.debug('[*] 收到疑似红包消息 %d 次' % redEnvelope)
                 elif selector == '7':
                     playWeChat += 1
                     print('[*] 你在手机上玩微信被我发现了 %d 次' % playWeChat)
@@ -1009,12 +999,8 @@ class WebWeixin(object):
             print('[*] 自动回复模式 ... 关闭')
             logging.debug('[*] 自动回复模式 ... 关闭')
 
-        if sys.platform.startswith('win'):
-            import _thread
-            _thread.start_new_thread(self.listenMsgMode())
-        else:
-            listenProcess = multiprocessing.Process(target=self.listenMsgMode)
-            listenProcess.start()
+        listenProcess = multiprocessing.Process(target=self.listenMsgMode)
+        listenProcess.start()
 
         while True:
             text = input('')
@@ -1129,13 +1115,10 @@ class WebWeixin(object):
     def _post(self, url: object, params: object, jsonfmt: object = True) -> object:
         if jsonfmt:
             data = (json.dumps(params)).encode()
-
             request = urllib.request.Request(url=url, data=data)
-            request.add_header(
-                'ContentType', 'application/json; charset=UTF-8')
+            request.add_header('ContentType', 'application/json; charset=UTF-8')
         else:
             request = urllib.request.Request(url=url, data=urllib.parse.urlencode(params).encode(encoding='utf-8'))
-
         try:
             response = urllib.request.urlopen(request)
             data = response.read()
@@ -1151,7 +1134,6 @@ class WebWeixin(object):
         except Exception:
             import traceback
             logging.error('generic exception: ' + traceback.format_exc())
-
         return ''
 
     def _searchContent(self, key, content, fmat='attr'):
@@ -1162,8 +1144,7 @@ class WebWeixin(object):
         elif fmat == 'xml':
             pm = re.search('<{0}>([^<]+)</{0}>'.format(key), content)
             if not pm:
-                pm = re.search(
-                    '<{0}><\!\[CDATA\[(.*?)\]\]></{0}>'.format(key), content)
+                pm = re.search('<{0}><\!\[CDATA\[(.*?)\]\]></{0}>'.format(key), content)
             if pm:
                 return pm.group(1)
         return '未知'
